@@ -1,467 +1,335 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NeuroVersatilist | neurohub.science</title>
-  <meta name="description" content="Where neuroscience, AI, and neurotech meet plain language. Coming soon." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NeuroVersatilist — neurohub.science</title>
+  <meta name="description" content="Neuroscience, AI, and neurotech explained by someone who has been inside the machine. No hype. No handwaving."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg:       #08090d;
-      --surface:  #0e1018;
+      --bg:       #07080c;
+      --surface:  #0d0f16;
+      --surface2: #12151f;
       --border:   rgba(255,255,255,0.07);
-      --accent:   #c8f04a;
-      --accent2:  #4af0c8;
-      --text:     #e8e9ee;
-      --muted:    #666b7a;
-      --glow:     rgba(200,240,74,0.18);
+      --border2:  rgba(255,255,255,0.12);
+      --lime:     #c8f04a;
+      --lime-glow:rgba(200,240,74,0.22);
+      --teal:     #4af0c8;
+      --text:     #e6e8f0;
+      --muted:    #555c72;
+      --muted2:   #3a3f50;
     }
-
-    html, body {
-      height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-      overflow-x: hidden;
-    }
-
-    /* ── canvas background ── */
-    canvas {
-      position: fixed;
-      inset: 0;
-      opacity: 0.35;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* ── grain overlay ── */
-    body::after {
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; overflow-x: hidden; }
+    body::before {
       content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-      background-size: 256px 256px;
-      pointer-events: none;
-      z-index: 1;
-      opacity: 0.6;
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      background-size: 200px 200px; pointer-events: none; z-index: 0; opacity: 0.55;
     }
+    canvas#bg { position: fixed; inset: 0; z-index: 0; opacity: 0.2; pointer-events: none; }
 
-    /* ── layout ── */
-    .wrapper {
-      position: relative;
-      z-index: 2;
-      min-height: 100vh;
-      display: grid;
-      grid-template-rows: auto 1fr auto;
-      padding: clamp(1.5rem, 5vw, 3rem);
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    /* ── header ── */
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-bottom: 2rem;
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.25rem clamp(1.5rem,5vw,3.5rem);
       border-bottom: 1px solid var(--border);
-      animation: fadeUp 0.8s ease both;
+      background: rgba(7,8,12,0.88); backdrop-filter: blur(12px);
     }
+    .nav-logo { font-family:'DM Mono',monospace; font-weight:300; font-size:0.75rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); text-decoration:none; transition:color 0.2s; }
+    .nav-logo span { color:var(--lime); }
+    .nav-logo:hover { color:var(--text); }
+    .nav-links { display:flex; gap:2rem; list-style:none; }
+    .nav-links a { font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); text-decoration:none; transition:color 0.2s; }
+    .nav-links a:hover { color:var(--lime); }
+    .nav-cta { font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--bg); background:var(--lime); padding:0.45rem 1.1rem; text-decoration:none; transition:background 0.2s, transform 0.15s; }
+    .nav-cta:hover { background:#d8ff5a; transform:translateY(-1px); }
+    @media (max-width:768px) { .nav-links { display:none; } }
 
-    .logo {
-      font-family: 'DM Mono', monospace;
-      font-weight: 300;
-      font-size: 0.78rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
+    /* HERO */
+    .hero {
+      position:relative; z-index:1; min-height:100vh;
+      display:grid; grid-template-columns:1fr 1fr;
+      align-items:center; gap:4rem;
+      padding:8rem clamp(1.5rem,5vw,3.5rem) 5rem;
+      max-width:1200px; margin:0 auto;
     }
+    @media (max-width:768px) { .hero { grid-template-columns:1fr; padding-top:7rem; } .hero-emblem { order:-1; display:flex; justify-content:center; } }
+    .hero-copy { display:flex; flex-direction:column; gap:2rem; }
+    .hero-eyebrow { font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.22em; text-transform:uppercase; color:var(--teal); animation:fadeUp 0.8s 0.1s ease both; }
+    h1 { font-family:'DM Serif Display',serif; font-size:clamp(3rem,6vw,5.5rem); line-height:0.95; font-weight:400; letter-spacing:-0.02em; animation:fadeUp 0.8s 0.2s ease both; }
+    h1 em { font-style:italic; color:var(--lime); }
+    .hero-tagline { font-size:clamp(0.95rem,1.8vw,1.1rem); color:var(--muted); max-width:46ch; line-height:1.75; animation:fadeUp 0.8s 0.35s ease both; }
+    .hero-tagline strong { color:var(--text); font-weight:400; }
+    .hero-form { display:flex; flex-direction:column; gap:0.75rem; animation:fadeUp 0.8s 0.5s ease both; }
+    .form-label { font-family:'DM Mono',monospace; font-size:0.68rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); }
+    .form-row { display:flex; }
+    .form-row input { flex:1; background:var(--surface); border:1px solid var(--border2); border-right:none; color:var(--text); font-family:'DM Sans',sans-serif; font-size:0.9rem; padding:0.8rem 1rem; outline:none; transition:border-color 0.2s, box-shadow 0.2s; min-width:0; }
+    .form-row input:focus { border-color:var(--lime); box-shadow:0 0 0 3px var(--lime-glow); }
+    .form-row input::placeholder { color:var(--muted2); }
+    .form-row button { background:var(--lime); color:#07080c; border:none; font-family:'DM Mono',monospace; font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.8rem 1.5rem; cursor:pointer; white-space:nowrap; transition:background 0.2s, transform 0.15s; }
+    .form-row button:hover { background:#d8ff5a; transform:translateY(-1px); }
+    .form-success { display:none; font-family:'DM Mono',monospace; font-size:0.72rem; color:var(--lime); }
+    .hero-emblem { display:flex; align-items:center; justify-content:center; animation:fadeIn 1.2s 0.3s ease both; }
+    .hero-emblem img { width:100%; max-width:480px; mix-blend-mode:lighten; filter:drop-shadow(0 0 40px rgba(200,200,80,0.15)); }
+    .scroll-cue { position:absolute; bottom:2rem; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:0.5rem; animation:fadeIn 1s 1.2s ease both; }
+    .scroll-cue span { font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted2); }
+    .scroll-line { width:1px; height:40px; background:linear-gradient(to bottom,var(--muted2),transparent); animation:scrollPulse 2s ease-in-out infinite; }
 
-    .logo span {
-      color: var(--accent);
-    }
+    /* DIVIDERS */
+    .divider { position:relative; z-index:1; display:flex; align-items:center; gap:1.5rem; padding:0 clamp(1.5rem,5vw,3.5rem); max-width:1200px; margin:0 auto; }
+    .divider-line { flex:1; height:1px; background:var(--border); }
+    .divider-label { font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted2); white-space:nowrap; }
 
-    .status-pill {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--accent);
-      border: 1px solid var(--accent);
-      padding: 0.3rem 0.75rem;
-      border-radius: 100px;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
+    /* PILLARS */
+    .pillars { position:relative; z-index:1; padding:5rem clamp(1.5rem,5vw,3.5rem); max-width:1200px; margin:0 auto; }
+    .pillars-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); border:1px solid var(--border); }
+    @media (max-width:680px) { .pillars-grid { grid-template-columns:1fr; } }
+    .pillar { background:var(--surface); padding:2.5rem 2rem; display:flex; flex-direction:column; gap:1rem; transition:background 0.25s; }
+    .pillar:hover { background:var(--surface2); }
+    .pillar-num { font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.2em; color:var(--lime); }
+    .pillar-icon { width:34px; height:34px; opacity:0.85; }
+    .pillar h3 { font-family:'DM Serif Display',serif; font-size:1.5rem; font-weight:400; line-height:1.1; }
+    .pillar p { font-size:0.88rem; color:var(--muted); line-height:1.7; }
+    .pillar-tag { margin-top:auto; font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted2); display:flex; align-items:center; gap:0.5rem; }
+    .pillar-tag::before { content:''; width:20px; height:1px; background:var(--muted2); }
 
-    .status-pill::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      animation: pulse 2s ease-in-out infinite;
-    }
+    /* POSTS */
+    .posts { position:relative; z-index:1; padding:0 clamp(1.5rem,5vw,3.5rem) 5rem; max-width:1200px; margin:0 auto; }
+    .posts-header { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:2.5rem; flex-wrap:wrap; gap:1rem; }
+    .posts-header h2 { font-family:'DM Serif Display',serif; font-size:2rem; font-weight:400; }
+    .posts-header a { font-family:'DM Mono',monospace; font-size:0.68rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); text-decoration:none; transition:color 0.2s; }
+    .posts-header a:hover { color:var(--lime); }
+    .posts-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1px; background:var(--border); border:1px solid var(--border); }
+    .post-card { background:var(--surface); padding:2rem; display:flex; flex-direction:column; gap:1rem; transition:background 0.25s; }
+    .post-card:hover { background:var(--surface2); }
+    .post-meta { display:flex; align-items:center; gap:0.75rem; }
+    .post-pill { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.14em; text-transform:uppercase; padding:0.25rem 0.6rem; border:1px solid var(--border2); color:var(--muted); }
+    .post-pill.lime { border-color:rgba(200,240,74,0.3); color:var(--lime); }
+    .post-date { font-family:'DM Mono',monospace; font-size:0.62rem; color:var(--muted2); }
+    .post-card h4 { font-family:'DM Serif Display',serif; font-size:1.2rem; font-weight:400; line-height:1.25; }
+    .post-card p { font-size:0.85rem; color:var(--muted); line-height:1.65; flex:1; }
+    .post-card.coming-soon { opacity:0.4; pointer-events:none; }
+    .coming-label { font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted2); border:1px dashed var(--muted2); padding:0.25rem 0.6rem; width:fit-content; }
 
-    /* ── main ── */
-    main {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: clamp(3rem, 8vh, 6rem) 0;
-      gap: 2.5rem;
-    }
+    /* ABOUT STRIP */
+    .about-strip { position:relative; z-index:1; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:5rem clamp(1.5rem,5vw,3.5rem); display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center; }
+    @media (max-width:768px) { .about-strip { grid-template-columns:1fr; gap:2.5rem; } }
+    .about-label { font-family:'DM Mono',monospace; font-size:0.68rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--lime); margin-bottom:1.5rem; }
+    .about-strip h2 { font-family:'DM Serif Display',serif; font-size:clamp(2rem,4vw,3rem); font-weight:400; line-height:1.1; margin-bottom:1.5rem; }
+    .about-strip h2 em { font-style:italic; color:var(--lime); }
+    .about-strip p { font-size:0.95rem; color:var(--muted); line-height:1.8; margin-bottom:2rem; max-width:52ch; }
+    .about-link { font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--text); text-decoration:none; border-bottom:1px solid var(--border2); padding-bottom:0.25rem; transition:color 0.2s, border-color 0.2s; }
+    .about-link:hover { color:var(--lime); border-color:var(--lime); }
+    .about-credentials { display:flex; flex-direction:column; gap:0; border:1px solid var(--border); }
+    .credential { padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); display:flex; align-items:baseline; gap:1rem; }
+    .credential:last-child { border-bottom:none; }
+    .credential-num { font-family:'DM Mono',monospace; font-size:0.6rem; color:var(--lime); letter-spacing:0.1em; white-space:nowrap; }
+    .credential-text { font-size:0.88rem; color:var(--text); line-height:1.5; }
+    .credential-sub { font-size:0.78rem; color:var(--muted); display:block; margin-top:0.2rem; }
 
-    .eyebrow {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.72rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--accent2);
-      animation: fadeUp 0.8s 0.1s ease both;
-    }
+    /* SUBSCRIBE */
+    .subscribe-section { position:relative; z-index:1; padding:6rem clamp(1.5rem,5vw,3.5rem); max-width:860px; margin:0 auto; text-align:center; display:flex; flex-direction:column; align-items:center; gap:2rem; }
+    .subscribe-section h2 { font-family:'DM Serif Display',serif; font-size:clamp(2.2rem,5vw,3.8rem); font-weight:400; line-height:1.05; letter-spacing:-0.02em; }
+    .subscribe-section h2 em { font-style:italic; color:var(--lime); }
+    .subscribe-section p { font-size:0.95rem; color:var(--muted); line-height:1.75; max-width:50ch; }
+    .subscribe-form { display:flex; width:100%; max-width:480px; }
+    .subscribe-form input { flex:1; background:var(--surface); border:1px solid var(--border2); border-right:none; color:var(--text); font-family:'DM Sans',sans-serif; font-size:0.9rem; padding:0.9rem 1.25rem; outline:none; transition:border-color 0.2s, box-shadow 0.2s; min-width:0; }
+    .subscribe-form input:focus { border-color:var(--lime); box-shadow:0 0 0 3px var(--lime-glow); }
+    .subscribe-form input::placeholder { color:var(--muted2); }
+    .subscribe-form button { background:var(--lime); color:#07080c; border:none; font-family:'DM Mono',monospace; font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.9rem 1.75rem; cursor:pointer; white-space:nowrap; transition:background 0.2s; }
+    .subscribe-form button:hover { background:#d8ff5a; }
+    .subscribe-note { font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.1em; color:var(--muted2); }
 
-    h1 {
-      font-family: 'DM Serif Display', serif;
-      font-size: clamp(3rem, 9vw, 6.5rem);
-      line-height: 0.95;
-      font-weight: 400;
-      letter-spacing: -0.02em;
-      animation: fadeUp 0.8s 0.2s ease both;
-    }
+    /* FOOTER */
+    footer { position:relative; z-index:1; border-top:1px solid var(--border); padding:2rem clamp(1.5rem,5vw,3.5rem); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+    .footer-logo { font-family:'DM Mono',monospace; font-size:0.72rem; letter-spacing:0.12em; color:var(--muted); text-decoration:none; }
+    .footer-logo span { color:var(--lime); }
+    .footer-links { display:flex; gap:1.5rem; list-style:none; }
+    .footer-links a { font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted2); text-decoration:none; transition:color 0.2s; }
+    .footer-links a:hover { color:var(--lime); }
+    .footer-copy { font-family:'DM Mono',monospace; font-size:0.62rem; color:var(--muted2); }
 
-    h1 em {
-      font-style: italic;
-      color: var(--accent);
-      display: inline-block;
-      position: relative;
-    }
-
-    h1 em::after {
-      content: '';
-      position: absolute;
-      bottom: 4px;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: var(--accent);
-      opacity: 0.4;
-      transform: scaleX(0);
-      transform-origin: left;
-      animation: lineIn 1s 1s ease forwards;
-    }
-
-    .tagline {
-      font-size: clamp(1rem, 2.2vw, 1.2rem);
-      color: var(--muted);
-      max-width: 52ch;
-      line-height: 1.7;
-      animation: fadeUp 0.8s 0.35s ease both;
-    }
-
-    .tagline strong {
-      color: var(--text);
-      font-weight: 400;
-    }
-
-    /* ── notify form ── */
-    .notify {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      animation: fadeUp 0.8s 0.5s ease both;
-    }
-
-    .notify-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.72rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .notify-row {
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-    }
-
-    .notify-row input {
-      flex: 1 1 220px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
-      padding: 0.75rem 1rem;
-      outline: none;
-      transition: border-color 0.2s;
-      min-width: 0;
-    }
-
-    .notify-row input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--glow);
-    }
-
-    .notify-row input::placeholder {
-      color: var(--muted);
-    }
-
-    .notify-row button {
-      background: var(--accent);
-      color: #08090d;
-      border: none;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.78rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 0.75rem 1.5rem;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-      white-space: nowrap;
-    }
-
-    .notify-row button:hover {
-      background: #d8ff5a;
-      transform: translateY(-1px);
-    }
-
-    .notify-row button:active {
-      transform: translateY(0);
-    }
-
-    .success-msg {
-      display: none;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.78rem;
-      color: var(--accent);
-      letter-spacing: 0.05em;
-    }
-
-    /* ── pillars ── */
-    .pillars {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      animation: fadeUp 0.8s 0.65s ease both;
-    }
-
-    .pillar {
-      background: var(--surface);
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      transition: background 0.2s;
-    }
-
-    .pillar:hover {
-      background: #12151f;
-    }
-
-    .pillar-num {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      color: var(--accent);
-      letter-spacing: 0.15em;
-    }
-
-    .pillar-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.1rem;
-      font-weight: 400;
-    }
-
-    .pillar-desc {
-      font-size: 0.82rem;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    /* ── footer ── */
-    footer {
-      padding-top: 2rem;
-      border-top: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 1rem;
-      animation: fadeUp 0.8s 0.8s ease both;
-    }
-
-    .footer-domain {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.72rem;
-      color: var(--muted);
-      letter-spacing: 0.1em;
-    }
-
-    .footer-domain span {
-      color: var(--accent);
-    }
-
-    .footer-note {
-      font-size: 0.78rem;
-      color: var(--muted);
-    }
-
-    /* ── animations ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.4; transform: scale(0.7); }
-    }
-
-    @keyframes lineIn {
-      to { transform: scaleX(1); }
-    }
+    /* ANIMATIONS */
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+    @keyframes scrollPulse { 0%,100% { opacity:0.3; } 50% { opacity:0.8; } }
+    .reveal { opacity:0; transform:translateY(24px); transition:opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity:1; transform:translateY(0); }
   </style>
 </head>
 <body>
+<canvas id="bg"></canvas>
 
-<canvas id="c"></canvas>
+<!-- NAV -->
+<nav>
+  <a href="/" class="nav-logo">neuro<span>hub</span>.science</a>
+  <ul class="nav-links">
+    <li><a href="/essays">Essays</a></li>
+    <li><a href="/notes">Notes</a></li>
+    <li><a href="/archive">Archive</a></li>
+    <li><a href="/about">About</a></li>
+  </ul>
+  <a href="#subscribe" class="nav-cta">Subscribe</a>
+</nav>
 
-<div class="wrapper">
-  <header>
-    <div class="logo">neurohub<span>.science</span></div>
-    <div class="status-pill">Forming</div>
-  </header>
-
-  <main>
-    <p class="eyebrow">Coming Soon</p>
-    <h1>The <em>Neuro</em><br>Versatil&shy;ist</h1>
-    <p class="tagline">
-      Neuroscience, AI, and neurotech, explained by someone who has actually
-      been inside the machine. <strong>No hype. No handwaving. Just the real thing,
-      made legible.</strong>
-    </p>
-
-    <div class="notify">
-      <p class="notify-label">Get notified at launch</p>
-      <div class="notify-row">
-        <input type="email" id="emailInput" placeholder="your@email.com" />
-        <button onclick="handleSubmit()">Notify me</button>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-copy">
+    <p class="hero-eyebrow">Neuroscience · AI · Neurotech</p>
+    <h1>The <em>Neuro</em><br>Versatilist</h1>
+    <p class="hero-tagline">The real thing, made legible. Written by someone who has been inside the machine — the pipelines, the models, the research. <strong>No hype. No handwaving.</strong></p>
+    <div class="hero-form">
+      <p class="form-label">Get new posts in your inbox</p>
+      <div class="form-row">
+        <input type="email" id="heroEmail" placeholder="your@email.com"/>
+        <button onclick="handleSubmit('heroEmail','heroSuccess','heroRow')">Subscribe free</button>
       </div>
-      <p class="success-msg" id="successMsg">You're on the list. Talk soon.</p>
+      <p class="form-success" id="heroSuccess">You're on the list. Talk soon.</p>
     </div>
+  </div>
 
-    <div class="pillars">
-      <div class="pillar">
-        <span class="pillar-num">01</span>
-        <span class="pillar-title">The Science</span>
-        <p class="pillar-desc">How the brain actually works, versus how it gets described in headlines.</p>
-      </div>
-      <div class="pillar">
-        <span class="pillar-num">02</span>
-        <span class="pillar-title">AI in Practice</span>
-        <p class="pillar-desc">What AI in neuroscience really looks like from inside a pipeline.</p>
-      </div>
-      <div class="pillar">
-        <span class="pillar-num">03</span>
-        <span class="pillar-title">Neurotech</span>
-        <p class="pillar-desc">Where the field is genuinely headed versus where it's being oversold.</p>
-      </div>
+  <div class="hero-emblem">
+    <img src="emblem.png" alt="NeuroVersatilist emblem — sagittal brain with neuron and action potential" />
+  </div>
+
+  <div class="scroll-cue">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- PILLARS -->
+<div class="divider reveal"><div class="divider-line"></div><span class="divider-label">Three pillars</span><div class="divider-line"></div></div>
+<section class="pillars reveal">
+  <div class="pillars-grid">
+    <div class="pillar">
+      <span class="pillar-num">01</span>
+      <svg class="pillar-icon" viewBox="0 0 34 34" fill="none"><ellipse cx="17" cy="17" rx="13" ry="9" stroke="#c8f04a" stroke-width="1.2"/><path d="M4 17 C8 11 13 8 17 8 C21 8 26 11 30 17" stroke="#c8f04a" stroke-width="1" stroke-linecap="round"/><circle cx="17" cy="17" r="3" fill="#c8f04a" opacity="0.8"/><line x1="17" y1="8" x2="17" y2="4" stroke="#c8f04a" stroke-width="1" stroke-linecap="round" opacity="0.5"/><line x1="10" y1="11" x2="7" y2="8" stroke="#c8f04a" stroke-width="1" stroke-linecap="round" opacity="0.5"/><line x1="24" y1="11" x2="27" y2="8" stroke="#c8f04a" stroke-width="1" stroke-linecap="round" opacity="0.5"/></svg>
+      <h3>The Science</h3>
+      <p>How the brain actually works versus how it gets described in headlines. Imaging methodology, network dynamics, and what the data really shows.</p>
+      <span class="pillar-tag">Neuroimaging · Methods · Research</span>
     </div>
-  </main>
+    <div class="pillar">
+      <span class="pillar-num">02</span>
+      <svg class="pillar-icon" viewBox="0 0 34 34" fill="none"><rect x="3" y="9" width="28" height="18" rx="3" stroke="#c8f04a" stroke-width="1.2"/><path d="M9 18 L13 18 L15 13 L18 23 L20 16 L22 18 L25 18" stroke="#c8f04a" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/><circle cx="29" cy="5" r="2.5" stroke="#c8f04a" stroke-width="1"/><circle cx="5" cy="5" r="2.5" stroke="#c8f04a" stroke-width="1"/><line x1="8" y1="5" x2="26" y2="5" stroke="#c8f04a" stroke-width="0.8" stroke-linecap="round"/></svg>
+      <h3>AI in Practice</h3>
+      <p>What machine learning in neuroscience actually looks like from inside a pipeline. Model evaluation, failure modes, and honest capability assessments.</p>
+      <span class="pillar-tag">ML · Evaluation · Pipelines</span>
+    </div>
+    <div class="pillar">
+      <span class="pillar-num">03</span>
+      <svg class="pillar-icon" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="15" r="8" stroke="#c8f04a" stroke-width="1.2"/><path d="M17 23 L17 30" stroke="#c8f04a" stroke-width="1.2" stroke-linecap="round"/><path d="M13 27 L21 27" stroke="#c8f04a" stroke-width="1" stroke-linecap="round"/><path d="M10 9 L5 6" stroke="#c8f04a" stroke-width="0.9" stroke-linecap="round" opacity="0.6"/><path d="M24 9 L29 6" stroke="#c8f04a" stroke-width="0.9" stroke-linecap="round" opacity="0.6"/><circle cx="5" cy="6" r="2" fill="#c8f04a" opacity="0.5"/><circle cx="29" cy="6" r="2" fill="#c8f04a" opacity="0.5"/></svg>
+      <h3>Neurotech</h3>
+      <p>Where the brain-computer interface field is genuinely headed versus where it's being oversold. Separating signal from noise in an industry full of both.</p>
+      <span class="pillar-tag">BCI · Industry · Implications</span>
+    </div>
+  </div>
+</section>
 
-  <footer>
-    <div class="footer-domain">neurohub<span>.science</span></div>
-    <p class="footer-note">Travis Beckwith, PhD &mdash; Neuroimaging Scientist</p>
-  </footer>
-</div>
+<!-- POSTS -->
+<div class="divider reveal"><div class="divider-line"></div><span class="divider-label">Latest</span><div class="divider-line"></div></div>
+<section class="posts reveal">
+  <div class="posts-header">
+    <h2>Recent Posts</h2>
+    <a href="/archive">All posts →</a>
+  </div>
+  <div class="posts-grid">
+    <div class="post-card coming-soon">
+      <div class="post-meta"><span class="post-pill lime">Essay</span><span class="post-date">Coming soon</span></div>
+      <h4>What your neuroimaging paper probably gets wrong about causality</h4>
+      <p>The gap between correlation and mechanism is wider than most fMRI studies acknowledge. Here's what the statistics actually say.</p>
+      <span class="coming-label">In progress</span>
+    </div>
+    <div class="post-card coming-soon">
+      <div class="post-meta"><span class="post-pill">Note</span><span class="post-date">Coming soon</span></div>
+      <h4>Three things the Neuralink coverage missed</h4>
+      <p>The headlines were about paralysis and mind control. The actual story is more interesting and more boring at the same time.</p>
+      <span class="coming-label">In progress</span>
+    </div>
+    <div class="post-card coming-soon">
+      <div class="post-meta"><span class="post-pill lime">Essay</span><span class="post-date">Coming soon</span></div>
+      <h4>Why AI can't read your mind yet — and what it would take</h4>
+      <p>A practitioner's guide to what large models actually know about neuroscience, and what they confidently hallucinate.</p>
+      <span class="coming-label">In progress</span>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT STRIP -->
+<div class="divider reveal"><div class="divider-line"></div><span class="divider-label">The Versatilist</span><div class="divider-line"></div></div>
+<section class="about-strip reveal">
+  <div>
+    <p class="about-label">About</p>
+    <h2>Not a generalist.<br>A <em>versatilist.</em></h2>
+    <p>There is a difference between someone who knows a little about a lot, and someone who goes deep in multiple areas and can move between them. Travis Beckwith is the latter — neuroimaging scientist, AI evaluator, neurotech adviser, and the rare practitioner who can make all of it legible.</p>
+    <a href="/about" class="about-link">Read the full story →</a>
+  </div>
+  <div class="about-credentials">
+    <div class="credential"><span class="credential-num">PhD</span><span class="credential-text">Neuroimaging Science<span class="credential-sub">15+ years pipeline development and MRI methodology</span></span></div>
+    <div class="credential"><span class="credential-num">AI</span><span class="credential-text">Machine Learning Evaluation<span class="credential-sub">Subject matter expertise in model behavior and failure modes</span></span></div>
+    <div class="credential"><span class="credential-num">NX</span><span class="credential-text">Neurotech Advisory<span class="credential-sub">Industry consulting across BCI and neurotechnology</span></span></div>
+    <div class="credential"><span class="credential-num">WR</span><span class="credential-text">Science Communication<span class="credential-sub">Humanities background informing how complex ideas get explained</span></span></div>
+  </div>
+</section>
+
+<!-- SUBSCRIBE -->
+<div class="divider reveal"><div class="divider-line"></div><span class="divider-label">Stay in the loop</span><div class="divider-line"></div></div>
+<section class="subscribe-section reveal" id="subscribe">
+  <h2>The real thing,<br><em>in your inbox.</em></h2>
+  <p>New essays and notes delivered when they're ready — no algorithm, no noise, no publishing cadence that burns either of us out.</p>
+  <div class="subscribe-form">
+    <input type="email" id="subEmail" placeholder="your@email.com"/>
+    <button onclick="handleSubmit('subEmail','subSuccess','subForm')">Subscribe free</button>
+  </div>
+  <p id="subSuccess" style="display:none;font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--lime);">You're on the list. Talk soon.</p>
+  <p class="subscribe-note">Free forever, for now. Paid tier coming later.</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="/" class="footer-logo">neuro<span>hub</span>.science</a>
+  <ul class="footer-links">
+    <li><a href="/essays">Essays</a></li>
+    <li><a href="/notes">Notes</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="#subscribe">Subscribe</a></li>
+  </ul>
+  <span class="footer-copy">© 2026 Travis Beckwith</span>
+</footer>
 
 <script>
-  // ── neural particle canvas ──
-  const canvas = document.getElementById('c');
-  const ctx    = canvas.getContext('2d');
-  let W, H, nodes, RAF;
-
-  function resize() {
-    W = canvas.width  = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  }
-
-  function initNodes(n = 55) {
-    nodes = Array.from({ length: n }, () => ({
-      x:  Math.random() * W,
-      y:  Math.random() * H,
-      vx: (Math.random() - 0.5) * 0.35,
-      vy: (Math.random() - 0.5) * 0.35,
-      r:  Math.random() * 2 + 1,
-    }));
-  }
-
+  // Neural canvas
+  const canvas = document.getElementById('bg');
+  const ctx = canvas.getContext('2d');
+  let W, H, nodes;
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  function initNodes(n=60) { nodes = Array.from({length:n},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*1.6+0.6})); }
   function draw() {
-    ctx.clearRect(0, 0, W, H);
-    const accent  = [200, 240, 74];
-    const accent2 = [74, 240, 200];
-
-    nodes.forEach(n => {
-      n.x += n.vx; n.y += n.vy;
-      if (n.x < 0 || n.x > W) n.vx *= -1;
-      if (n.y < 0 || n.y > H) n.vy *= -1;
-
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${accent[0]},${accent[1]},${accent[2]},0.6)`;
-      ctx.fill();
-    });
-
-    for (let i = 0; i < nodes.length; i++) {
-      for (let j = i + 1; j < nodes.length; j++) {
-        const dx   = nodes[i].x - nodes[j].x;
-        const dy   = nodes[i].y - nodes[j].y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 140) {
-          const alpha = (1 - dist / 140) * 0.5;
-          const mix   = dist / 140;
-          const r = Math.round(accent[0] * (1 - mix) + accent2[0] * mix);
-          const g = Math.round(accent[1] * (1 - mix) + accent2[1] * mix);
-          const b = Math.round(accent[2] * (1 - mix) + accent2[2] * mix);
-          ctx.beginPath();
-          ctx.moveTo(nodes[i].x, nodes[i].y);
-          ctx.lineTo(nodes[j].x, nodes[j].y);
-          ctx.strokeStyle = `rgba(${r},${g},${b},${alpha})`;
-          ctx.lineWidth   = 0.8;
-          ctx.stroke();
-        }
-      }
-    }
-
-    RAF = requestAnimationFrame(draw);
+    ctx.clearRect(0,0,W,H);
+    nodes.forEach(n=>{ n.x+=n.vx; n.y+=n.vy; if(n.x<0||n.x>W)n.vx*=-1; if(n.y<0||n.y>H)n.vy*=-1; ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2); ctx.fillStyle='rgba(200,240,74,0.7)'; ctx.fill(); });
+    for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){const dx=nodes[i].x-nodes[j].x,dy=nodes[i].y-nodes[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<130){const a=(1-d/130)*.4,t=d/130;ctx.beginPath();ctx.moveTo(nodes[i].x,nodes[i].y);ctx.lineTo(nodes[j].x,nodes[j].y);ctx.strokeStyle=`rgba(${Math.round(200*(1-t)+74*t)},240,${Math.round(74*(1-t)+200*t)},${a})`;ctx.lineWidth=0.7;ctx.stroke();}}
+    requestAnimationFrame(draw);
   }
+  resize(); initNodes(); draw();
+  window.addEventListener('resize',()=>{resize();initNodes();});
 
-  resize();
-  initNodes();
-  draw();
-  window.addEventListener('resize', () => { resize(); initNodes(); });
+  // Scroll reveal
+  const obs = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}}),{threshold:0.08});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
-  // ── email notify ──
-  function handleSubmit() {
-    const input = document.getElementById('emailInput');
-    const msg   = document.getElementById('successMsg');
-    if (!input.value || !input.value.includes('@')) {
-      input.style.borderColor = '#f04a4a';
-      setTimeout(() => input.style.borderColor = '', 1200);
-      return;
-    }
+  // Email capture
+  function handleSubmit(inputId, successId) {
+    const input = document.getElementById(inputId);
+    const success = document.getElementById(successId);
+    if (!input.value.includes('@')) { input.style.borderColor='#f04a4a'; setTimeout(()=>input.style.borderColor='',1500); return; }
     input.parentElement.style.display = 'none';
-    msg.style.display = 'block';
+    success.style.display = 'block';
   }
 </script>
 </body>
